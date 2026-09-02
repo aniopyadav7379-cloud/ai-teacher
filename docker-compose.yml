@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ai_teacher
+      POSTGRES_PASSWORD: ai_teacher
+      POSTGRES_DB: ai_teacher
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_teacher"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://ai_teacher:ai_teacher@db:5432/ai_teacher
+      JOB_QUEUE_BACKEND: rq
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - upload_data:/app/data/uploads
+      - media_data:/app/data/media
+      - vector_data:/app/data/chroma
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["python", "-m", "workers.worker"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://ai_teacher:ai_teacher@db:5432/ai_teacher
+      JOB_QUEUE_BACKEND: rq
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        # Waits for backend's healthcheck, which only passes after its
+        # startup command (`alembic upgrade head`) has completed — avoids a
+        # race where the worker starts processing jobs against tables that
+        # haven't been migrated yet.
+        condition: service_healthy
+    volumes:
+      - upload_data:/app/data/uploads
+      - media_data:/app/data/media
+      - vector_data:/app/data/chroma
+    # Scale independently of the API under load:  docker compose up --scale worker=3
+    deploy:
+      replicas: 1
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports: ["3000:80"]
+
+volumes:
+  db_data:
+  upload_data:
+  media_data:
+  vector_data:
