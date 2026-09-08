@@ -559,6 +559,48 @@
 # 
 
 # \## 16. Demo instructions
+## 🎥 Demo
+
+See AI Teacher in action:
+
+**[▶️ Watch the AI Teacher Demo](./demo.mp4)**
+
+> The demo shows the complete student workflow from starting a lesson through
+> AI-generated teaching, adaptive re-teaching, and progress tracking.
+
+## 📸 Application Screenshots
+
+### 🏠 Landing Page
+
+![AI Teacher Landing Page](landing-page.png)
+
+### 🔐 Sign In
+
+![AI Teacher Sign In](sign-in.png)
+
+### 🚀 Start Lesson
+
+![Start Lesson](start-lesson.png)
+
+### 📝 Topic Input
+
+![Topic Input](topic-input.png)
+
+### 🧠 AI Lesson Plan
+
+![Generate Lesson Plan](generate-plan.png)
+
+### 🎓 Lesson Player
+
+![AI Teacher Lesson Player](lesson-player.png)
+
+### 🔄 Adaptive Misconception Re-teaching
+
+![Misconception Re-teaching](misconception-reteaching.png)
+
+### 📈 Progress History
+
+![Progress History](progress-history.png)
 
 # 
 
