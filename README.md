@@ -558,15 +558,18 @@
 
 # 
 
-# \## 16. Demo instructions
-## 🎥 Demo
+## 🎥 AI Teacher Demo
 
-See AI Teacher in action:
+### ▶️ Full Project Demo
 
-**[▶️ Watch the AI Teacher Demo](./demo.mp4)**
+[![AI Teacher Demo](landing-page.png)](./demo.mp4)
 
-> The demo shows the complete student workflow from starting a lesson through
-> AI-generated teaching, adaptive re-teaching, and progress tracking.
+**[▶️ Click here to watch the full AI Teacher Demo](./demo.mp4)**
+
+> Complete workflow: lesson setup → AI-generated teaching →
+> adaptive re-teaching → progress tracking.
+
+---
 
 ## 📸 Application Screenshots
 
