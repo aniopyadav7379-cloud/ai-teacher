@@ -141,6 +141,7 @@ class Lesson(Base):
 
 class LessonConcept(Base):
     __tablename__ = "lesson_concepts"
+
     id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
     lesson_id: Mapped[str] = mapped_column(ForeignKey("lessons.id"))
     order_index: Mapped[int] = mapped_column(Integer)
@@ -153,15 +154,26 @@ class LessonConcept(Base):
     explanation: Mapped[str] = mapped_column(Text, default="")
     example: Mapped[str] = mapped_column(Text, default="")
     analogy: Mapped[str] = mapped_column(Text, default="")
-    source_citation: Mapped[str | None] = mapped_column(String, nullable=True)  # e.g. "Chapter 4, Page 37"
+    source_citation: Mapped[str | None] = mapped_column(
+        String, nullable=True
+    )
 
     visual_spec: Mapped[dict] = mapped_column(JSON, default=dict)
-    status: Mapped[str] = mapped_column(String, default="pending")  # pending|taught|mastered|struggling
+
+    @property
+    def visual_type(self) -> str:
+        """Expose visual_type from the stored visual_spec JSON."""
+        return (self.visual_spec or {}).get("visual_type", "none")
+
+    status: Mapped[str] = mapped_column(
+        String, default="pending"
+    )  # pending|taught|mastered|struggling
 
     lesson: Mapped["Lesson"] = relationship(back_populates="concepts")
     questions: Mapped[list["Question"]] = relationship(back_populates="concept")
-    video: Mapped["TeachingVideo"] = relationship(back_populates="concept", uselist=False)
-
+    video: Mapped["TeachingVideo"] = relationship(
+        back_populates="concept", uselist=False
+    )
 
 # ---------------------------------------------------------------- Questions / Responses
 class Question(Base):

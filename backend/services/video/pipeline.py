@@ -29,14 +29,19 @@ def build_teaching_script(concept: models.LessonConcept) -> str:
     return " ".join(p.strip() for p in parts if p.strip())
 
 
-async def generate_teaching_video(db: Session, concept_id: str, language: str) -> None:
-    """Full media pipeline for one concept. Never raises — all failures are
-    recorded on the TeachingVideo row so the UI can show a real error state."""
+async def generate_teaching_video(
+    db: Session,
+    concept_id: str,
+    language: str,
+) -> None:
+    """Full media pipeline for one concept."""
+
     concept = db.get(models.LessonConcept, concept_id)
     if concept is None:
         return
 
     video = concept.video
+
     if video is None:
         video = models.TeachingVideo(concept_id=concept_id)
         db.add(video)
@@ -55,36 +60,51 @@ async def generate_teaching_video(db: Session, concept_id: str, language: str) -
 
         # 2. Voice
         tts = get_tts_provider()
-        tts_result = await tts.synthesize(video.script, language=language)
-        audio_path = media_dir / f"{video.id}.mp3"
+        tts_result = await tts.synthesize(
+            video.script,
+            language=language,
+        )
+
+        audio_extension = (
+            "wav"
+            if tts_result.content_type == "audio/wav"
+            else "mp3"
+        )
+
+        audio_path = media_dir / f"{video.id}.{audio_extension}"
         audio_path.write_bytes(tts_result.audio_bytes)
+
         video.audio_url = f"/media/{audio_path.name}"
         video.status = "voice_ready"
         db.commit()
 
-        # 3. Avatar (may be synchronous-fake "ready" for the browser-avatar
-        # fallback, or an async job id for a cloud provider like D-ID).
+        # 3. Avatar
         avatar = get_avatar_provider()
-        avatar_result = await avatar.generate_video(audio_url=video.audio_url, script_text=video.script)
+
+        avatar_result = await avatar.generate_video(
+            audio_url=video.audio_url,
+            script_text=video.script,
+        )
+
         video.provider = type(avatar).__name__
+
         if avatar_result.status == "ready":
-            video.avatar_video_url = avatar_result.video_url  # None => browser renders live from audio_url
+            video.avatar_video_url = avatar_result.video_url
             video.status = "ready"
         else:
-            # Async provider: store the job id in provider field's companion and mark assembling.
-            # A polling endpoint (see api/routes/teaching.py) checks status later.
             video.status = "assembling"
             video.error_message = None
             video.avatar_video_url = None
-            video.provider = f"{video.provider}:{avatar_result.provider_job_id}"
+            video.provider = (
+                f"{video.provider}:{avatar_result.provider_job_id}"
+            )
+
         db.commit()
 
-    except Exception as e:  # noqa: BLE001 — media pipeline stage must not crash the app
+    except Exception as e:
         video.status = "failed"
         video.error_message = str(e)
         db.commit()
-
-
 async def poll_avatar_status(db: Session, concept_id: str) -> models.TeachingVideo | None:
     """For async avatar providers: check job status and update the video record."""
     concept = db.get(models.LessonConcept, concept_id)

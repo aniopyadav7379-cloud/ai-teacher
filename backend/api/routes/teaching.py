@@ -14,14 +14,62 @@ router = APIRouter(prefix="/api/teaching", tags=["teaching"])
 
 
 @router.post("/video/{concept_id}/generate", status_code=202)
-def kick_off_video(concept_id: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
+def kick_off_video(
+    concept_id: str,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
     concept = db.get(models.LessonConcept, concept_id)
+
     if concept is None:
         raise HTTPException(404, "Concept not found")
-    lesson = db.get(models.Lesson, concept.lesson_id)
-    get_job_queue(background_tasks).enqueue(_run_video_gen, concept_id, lesson.language)
-    return {"status": "started"}
 
+    # Create the video row BEFORE enqueueing the background job.
+    # This makes the operation safe even if the frontend sends
+    # multiple generate requests at nearly the same time.
+    if concept.video is None:
+        video = models.TeachingVideo(
+            concept_id=concept_id,
+            status="queued",
+        )
+        db.add(video)
+
+        try:
+            db.commit()
+            db.refresh(video)
+        except Exception:
+            db.rollback()
+
+            # Another concurrent request may have created it.
+            concept = db.get(models.LessonConcept, concept_id)
+
+            if concept.video is not None:
+                return {
+                    "status": "already_started",
+                    "video_status": concept.video.status,
+                }
+
+            raise
+
+    else:
+        return {
+            "status": "already_started",
+            "video_status": concept.video.status,
+        }
+
+    lesson = db.get(models.Lesson, concept.lesson_id)
+
+    if lesson is None:
+        raise HTTPException(404, "Lesson not found")
+
+    get_job_queue(background_tasks).enqueue(
+        _run_video_gen,
+        concept_id,
+        lesson.language,
+    )
+
+    return {"status": "started"}
 
 def _run_video_gen(concept_id: str, language: str):
     import asyncio

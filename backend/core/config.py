@@ -5,11 +5,18 @@ All secrets/config come from environment variables (never hardcoded).
 See .env.example for the full documented list.
 """
 from functools import lru_cache
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+    env_file=BASE_DIR / ".env",
+    extra="ignore",
+)
 
     # Core
     app_env: str = "development"
@@ -28,12 +35,15 @@ class Settings(BaseSettings):
     media_dir: str = "./data/media"
     max_upload_mb: int = 50
 
-    # LLM
+        # LLM
     llm_provider: str = "anthropic"
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-6"
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_api_key: str = ""
+    ollama_model: str = "llama3.2"
 
-    # Embeddings
+       # Embeddings
     embedding_provider: str = "openai"
     openai_api_key: str = ""
     embedding_model: str = "text-embedding-3-small"

@@ -1,34 +1,25 @@
-# Python
+# Environment
+.env
 .venv/
 venv/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-.pytest_cache/
-*.egg-info/
-.coverage
-htmlcov/
+*.py[cod]
 
-# Node / frontend
-node_modules/
-dist/
-.vite/
-
-# Environment / secrets — never commit real values
-.env
-.env.local
-.env.*.local
-frontend/.env
-frontend/.env.local
-
-# Runtime data — keep directory structure (.gitkeep) but not generated content
-data/*
-!data/**/.gitkeep
+# Local databases
 *.db
+*.sqlite
 *.sqlite3
 
-# OS / editor
-.DS_Store
-*.swp
-.idea/
-.vscode/
+# Generated media
+*.mp4
+*.mp3
+*.wav
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Local data
+data/
