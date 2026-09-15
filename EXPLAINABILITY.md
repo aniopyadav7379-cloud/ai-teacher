@@ -1,11 +1,11 @@
-﻿# Decision
+﻿# Decision and Reasoning
 
-The agent decides how to respond based on the student's question, learning context, and available educational material. It chooses explanations, examples, practice questions, or guidance that best supports the student's learning goal.
+The agent makes a decision about how to respond based on the student's question, learning context, and available educational material. Its reasoning considers the student's learning goal and chooses explanations, examples, practice questions, or guidance that best supports that goal.
 
-# Inputs
+# Inputs and Data Sources
 
-The agent uses the student's questions, learning-session information, educational materials, topic information, answers, and available progress data as inputs. These inputs help the agent determine what the student is learning and what type of assistance is appropriate.
+The agent uses inputs such as the student's questions, learning-session information, educational materials, topic information, answers, and available progress data. These data sources help the agent determine what the student is learning and what type of assistance is appropriate.
 
-# Limits
+# Limits and Constraints
 
-The agent is limited by the information and educational context available to it at runtime. It should communicate uncertainty or limitations when it does not have enough information to provide a reliable answer.
+The agent has limits based on the information and educational context available to it at runtime. Known constraints include insufficient context or missing information, and the agent should communicate uncertainty or limitations when it cannot provide a reliable answer.
