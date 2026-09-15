@@ -1,11 +1,11 @@
-﻿## Decision
+﻿# Decision
 
-The agent makes a decision about how to respond based on the student's question, learning context, available educational materials, topic information, previous answers, and learning progress. Its reasoning determines whether the student needs an explanation, example, guided practice, question answering, assessment, or other learning support.
+The agent decides what to teach next by evaluating the student's current question, answer, lesson concept, learner level, language, and learning progress. Its reasoning uses the evaluation result and the number of consecutive struggles on the current concept to decide whether to advance, reinforce, clarify a gap, or provide a new and simpler explanation.
 
-## Inputs
+# Inputs
 
-The agent uses input from the student's questions, learning sessions, uploaded educational materials, analyzed topics, lesson information, submitted answers, assessments, and available progress data. These data sources and data used by the agent provide the context needed to understand the student's current learning activity and determine an appropriate response.
+The agent uses input from the student's questions and answers, the current lesson and concept, uploaded educational materials, topic information, learner level, language, assessment results, and stored learning progress. These data sources are used to evaluate the student's understanding, identify misconceptions, determine the appropriate teaching action, and continue the lesson from the correct concept.
 
-## Limits
+# Limits
 
-The agent has limitations and constraints based on the information, educational materials, and learning context available at runtime. Known issues include missing, unavailable, uncertain, or insufficient information, and the agent should communicate the limitation rather than inventing information or presenting an uncertain answer as fact.
+The agent has limitations and constraints because its decisions depend on the educational material, learning context, stored session state, and information available at runtime. Known issues include missing or insufficient context and uncertainty in evaluating an answer, so the agent should communicate limitations instead of inventing information or treating an uncertain evaluation as fact.
