@@ -1,11 +1,13 @@
-﻿## Decision Logic
+﻿# AI Teacher Explainability
 
-The agent decides what to teach next by evaluating the student's current question, answer, lesson concept, learner level, language, and learning progress. Its reasoning uses the evaluation result and the number of consecutive struggles on the current concept to decide whether to advance, reinforce, clarify a gap, or provide a new and simpler explanation.
+## Decision Logic
 
-## Inputs and Data Sources
+The agent decides what to teach next by evaluating the student's current question, answer, lesson concept, learner level, language, and learning progress. It uses the evaluation result and the number of consecutive struggles on the current concept to determine whether to advance, reinforce the concept, clarify a learning gap, or provide a new and simpler explanation.
 
-The agent uses input from the student's questions and answers, the current lesson and concept, uploaded educational materials, topic information, learner level, language, assessment results, and stored learning progress. These data sources are used to evaluate the student's understanding, identify misconceptions, determine the appropriate teaching action, and continue the lesson from the correct concept.
+## Data Inputs
 
-## Limitations and Constraints
+The primary data sources are the student's questions and answers, the current lesson and concept, uploaded educational materials, topic information, learner level, language, assessment results, and stored learning progress. The agent also uses retrieved educational content from the RAG pipeline to provide context for teaching and evaluation.
 
-The agent has limitations because its decisions depend on the educational material, learning context, stored session state, and information available at runtime. Known issues include missing or insufficient context and uncertainty in evaluating an answer, so the agent should communicate limitations instead of inventing information or treating an uncertain evaluation as fact.
+## Known Limitations
+
+One limitation is that the quality of teaching decisions depends on the educational material, available lesson context, stored session state, and information available at runtime. Another known issue is that answer evaluation and misconception detection can be uncertain, so the agent should communicate insufficient context or uncertainty instead of inventing information.
